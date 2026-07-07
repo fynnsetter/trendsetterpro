@@ -25,45 +25,46 @@ export default function DashboardLayout({
     <div className="min-h-screen bg-[#1a2332]">
       <div className="border-b border-white/10 bg-white/5">
         <div className="max-w-6xl mx-auto px-4">
-          {/* 🔥 Logo in top-left */}
-          <div className="flex items-center justify-between py-4">
-            <Link href="/dashboard/overview" className="flex items-center gap-2 shrink-0">
-              <span className="text-2xl font-bold tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
-                <span className="text-[#d8bb6b]">Trend</span>
-                <span className="text-white">Setter</span>
-              </span>
-            </Link>
-            
-            {/* Right side: Notification + Search */}
-            <div className="flex items-center gap-4">
-              <NotificationBell />
-              <div className="w-64">
+          <div className="flex flex-col gap-4 py-4">
+            {/* Logo + Tabs - Stack on mobile */}
+            <div className="flex flex-wrap items-center gap-4 overflow-x-auto">
+              <Link href="/dashboard/overview" className="flex items-center gap-2 shrink-0">
+                <span className="text-2xl font-bold tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
+                  <span className="text-[#d8bb6b]">Trend</span>
+                  <span className="text-white">Setter</span>
+                </span>
+              </Link>
+
+              <nav className="flex gap-4 text-sm flex-wrap" aria-label="Tabs">
+                {tabs.map((tab) => {
+                  const isActive = 
+                    pathname === tab.href || 
+                    (tab.id === 'overview' && pathname === '/dashboard')
+                  return (
+                    <Link
+                      key={tab.id}
+                      href={tab.href}
+                      className={`py-2 border-b-2 font-medium text-sm transition-all whitespace-nowrap ${
+                        isActive
+                          ? 'border-[#d8bb6b] text-[#d8bb6b]'
+                          : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      {tab.label}
+                    </Link>
+                  )
+                })}
+              </nav>
+            </div>
+
+            {/* Search & Notification - Stack on mobile */}
+            <div className="flex flex-wrap items-center gap-4">
+              <div className="flex-1 min-w-[200px]">
                 <SearchAutocomplete />
               </div>
+              <NotificationBell />
             </div>
           </div>
-
-          {/* 🔥 Tabs below logo */}
-          <nav className="flex space-x-6 flex-wrap pb-2" aria-label="Tabs">
-            {tabs.map((tab) => {
-              const isActive = 
-                pathname === tab.href || 
-                (tab.id === 'overview' && pathname === '/dashboard')
-              return (
-                <Link
-                  key={tab.id}
-                  href={tab.href}
-                  className={`py-2 border-b-2 font-medium text-sm transition-all ${
-                    isActive
-                      ? 'border-[#d8bb6b] text-[#d8bb6b]'
-                      : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  {tab.label}
-                </Link>
-              )
-            })}
-          </nav>
         </div>
       </div>
       

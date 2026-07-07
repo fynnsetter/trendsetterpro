@@ -113,9 +113,9 @@ export default function NotificationBell() {
         )}
       </button>
 
-      {/* Dropdown */}
+      {/* Dropdown - Mobile responsive */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 max-h-[400px] overflow-y-auto bg-[#1a2332] border border-white/10 rounded-xl shadow-2xl z-50">
+        <div className="absolute right-0 mt-2 w-[calc(100vw-2rem)] max-w-sm max-h-[400px] overflow-y-auto bg-[#1a2332] border border-white/10 rounded-xl shadow-2xl z-50">
           <div className="sticky top-0 bg-[#1a2332] border-b border-white/10 p-4 flex justify-between items-center">
             <h3 className="text-white font-medium">Notifications</h3>
             {unreadCount > 0 && (

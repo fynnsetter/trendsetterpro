@@ -264,7 +264,7 @@ export default function OverviewPage() {
   const totalPnl = totalValue - totalCost
   const totalPnlPercent = totalCost > 0 ? (totalPnl / totalCost) * 100 : 0
 
-  // 🔥 Show ALL holdings (including those with 0 shares)
+  // Show all holdings (including 0 shares)
   const validHoldings = holdings
 
   if (loading) {
@@ -278,63 +278,63 @@ export default function OverviewPage() {
   return (
     <div>
       {/* Header */}
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-light text-white">
+          <h1 className="text-2xl sm:text-3xl font-light text-white">
             Welcome back, <span className="text-[#d8bb6b] font-bold">{fullName}</span>
           </h1>
-          <p className="text-gray-400/70 mt-1">Your AI-powered investment dashboard</p>
+          <p className="text-gray-400/70 mt-1 text-sm">Your AI-powered investment dashboard</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
           <Link 
             href="/add-stock" 
-            className="px-4 py-2 bg-[#d8bb6b] text-[#1a2332] font-semibold rounded-lg hover:bg-[#c4a45a] transition-all"
+            className="flex-1 sm:flex-none text-center px-4 py-2 bg-[#d8bb6b] text-[#1a2332] font-semibold rounded-lg hover:bg-[#c4a45a] transition-all text-sm"
           >
             Add Stock
           </Link>
           <button 
             onClick={handleLogout}
-            className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white/70 hover:bg-white/10 hover:border-white/20 transition-all"
+            className="flex-1 sm:flex-none text-center px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white/70 hover:bg-white/10 transition-all text-sm"
           >
             Sign Out
           </button>
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-          <p className="text-gray-400/70 text-sm">Portfolio Value</p>
-          <p className="text-3xl font-bold text-white mt-2">
+      {/* Stats Cards - Responsive grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
+        <div className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6">
+          <p className="text-gray-400/70 text-xs sm:text-sm">Portfolio Value</p>
+          <p className="text-xl sm:text-3xl font-bold text-white mt-1 sm:mt-2">
             £{totalValue.toFixed(2)}
           </p>
-          <p className="text-gray-400/50 text-sm mt-1">{validHoldings.length} holdings</p>
+          <p className="text-gray-400/50 text-xs mt-1">{validHoldings.length} holdings</p>
         </div>
 
-        <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-          <p className="text-gray-400/70 text-sm">Cost Basis</p>
-          <p className="text-3xl font-bold text-white mt-2">
+        <div className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6">
+          <p className="text-gray-400/70 text-xs sm:text-sm">Cost Basis</p>
+          <p className="text-xl sm:text-3xl font-bold text-white mt-1 sm:mt-2">
             £{totalCost.toFixed(2)}
           </p>
-          <p className="text-gray-400/50 text-sm mt-1">Total invested</p>
+          <p className="text-gray-400/50 text-xs mt-1">Total invested</p>
         </div>
 
-        <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-          <p className="text-gray-400/70 text-sm">Total P&L</p>
-          <p className={`text-3xl font-bold mt-2 ${totalPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+        <div className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6">
+          <p className="text-gray-400/70 text-xs sm:text-sm">Total P&L</p>
+          <p className={`text-xl sm:text-3xl font-bold mt-1 sm:mt-2 ${totalPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
             {totalPnl >= 0 ? '+' : ''}£{totalPnl.toFixed(2)}
           </p>
-          <p className={`text-sm mt-1 ${totalPnlPercent >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+          <p className={`text-xs mt-1 ${totalPnlPercent >= 0 ? 'text-green-400' : 'text-red-400'}`}>
             {totalPnlPercent >= 0 ? '+' : ''}{totalPnlPercent.toFixed(2)}%
           </p>
         </div>
 
-        <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-          <p className="text-gray-400/70 text-sm">Net Worth</p>
-          <p className="text-3xl font-bold text-white mt-2">
+        <div className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6">
+          <p className="text-gray-400/70 text-xs sm:text-sm">Net Worth</p>
+          <p className="text-xl sm:text-3xl font-bold text-white mt-1 sm:mt-2">
             £{(totalValue + cashBalance).toFixed(2)}
           </p>
-          <p className="text-gray-400/50 text-sm mt-1">Portfolio + Cash</p>
+          <p className="text-gray-400/50 text-xs mt-1">Portfolio + Cash</p>
         </div>
       </div>
 
@@ -376,64 +376,64 @@ export default function OverviewPage() {
         )}
       </div>
 
-      {/* AI Portfolio Builder - Always Visible */}
+      {/* AI Portfolio Builder */}
       <div className="mt-8">
         <PortfolioBuilder />
       </div>
 
       {/* Holdings Table */}
-      <div className="mt-8 bg-white/5 border border-white/10 rounded-xl p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-light text-white">Your Holdings</h2>
+      <div className="mt-8 bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+          <h2 className="text-lg sm:text-xl font-light text-white">Your Holdings</h2>
           {pricesLoading && (
             <span className="text-gray-400/50 text-sm">Updating prices...</span>
           )}
         </div>
         
         {validHoldings.length === 0 ? (
-          <div className="text-center py-16">
+          <div className="text-center py-12 sm:py-16">
             <div className="text-4xl mb-4 text-gray-500">📈</div>
-            <h3 className="text-xl font-light text-white">No holdings yet</h3>
-            <p className="text-gray-400/70 mt-2">Add your first stock to start tracking your portfolio.</p>
+            <h3 className="text-lg sm:text-xl font-light text-white">No holdings yet</h3>
+            <p className="text-gray-400/70 mt-2 text-sm">Add your first stock to start tracking your portfolio.</p>
             <Link 
               href="/add-stock" 
-              className="inline-block mt-4 px-6 py-2 bg-[#d8bb6b] text-[#1a2332] font-semibold rounded-lg hover:bg-[#c4a45a] transition-all"
+              className="inline-block mt-4 px-6 py-2 bg-[#d8bb6b] text-[#1a2332] font-semibold rounded-lg hover:bg-[#c4a45a] transition-all text-sm"
             >
               Add Stock
             </Link>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-[600px] text-sm">
               <thead>
                 <tr className="border-b border-white/10">
-                  <th className="text-left py-3 text-gray-400/70 font-light">Ticker</th>
-                  <th className="text-right py-3 text-gray-400/70 font-light">Shares</th>
-                  <th className="text-right py-3 text-gray-400/70 font-light">Avg Price</th>
-                  <th className="text-right py-3 text-gray-400/70 font-light">Current Price</th>
-                  <th className="text-right py-3 text-gray-400/70 font-light">Total Value</th>
-                  <th className="text-right py-3 text-gray-400/70 font-light">P&L</th>
-                  <th className="text-right py-3 text-gray-400/70 font-light">Purchase Date</th>
-                  <th className="text-right py-3 text-gray-400/70 font-light">Action</th>
+                  <th className="text-left py-2 sm:py-3 text-gray-400/70 font-light text-xs sm:text-sm">Ticker</th>
+                  <th className="text-right py-2 sm:py-3 text-gray-400/70 font-light text-xs sm:text-sm">Shares</th>
+                  <th className="text-right py-2 sm:py-3 text-gray-400/70 font-light text-xs sm:text-sm">Avg Price</th>
+                  <th className="text-right py-2 sm:py-3 text-gray-400/70 font-light text-xs sm:text-sm">Current</th>
+                  <th className="text-right py-2 sm:py-3 text-gray-400/70 font-light text-xs sm:text-sm">Total Value</th>
+                  <th className="text-right py-2 sm:py-3 text-gray-400/70 font-light text-xs sm:text-sm">P&L</th>
+                  <th className="text-right py-2 sm:py-3 text-gray-400/70 font-light text-xs sm:text-sm">Date</th>
+                  <th className="text-right py-2 sm:py-3 text-gray-400/70 font-light text-xs sm:text-sm">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {validHoldings.map((holding) => (
                   <tr key={holding.id} className="border-b border-white/5">
-                    <td className="py-3 text-white font-medium">{holding.ticker}</td>
-                    <td className="py-3 text-white text-right">{holding.shares.toFixed(4)}</td>
-                    <td className="py-3 text-white text-right">£{holding.avg_price.toFixed(2)}</td>
-                    <td className="py-3 text-white text-right">
+                    <td className="py-2 sm:py-3 text-white font-medium text-sm">{holding.ticker}</td>
+                    <td className="py-2 sm:py-3 text-white text-right text-sm">{holding.shares.toFixed(4)}</td>
+                    <td className="py-2 sm:py-3 text-white text-right text-sm">£{holding.avg_price.toFixed(2)}</td>
+                    <td className="py-2 sm:py-3 text-white text-right text-sm">
                       {holding.current_price ? (
                         `£${holding.current_price.toFixed(2)}`
                       ) : (
                         <span className="text-gray-400/50">—</span>
                       )}
                     </td>
-                    <td className="py-3 text-white text-right">
+                    <td className="py-2 sm:py-3 text-white text-right text-sm">
                       £{(holding.shares * (holding.current_price || holding.avg_price)).toFixed(2)}
                     </td>
-                    <td className="py-3 text-right">
+                    <td className="py-2 sm:py-3 text-right text-sm">
                       {holding.pnl !== undefined && holding.pnl !== null ? (
                         <span className={holding.pnl >= 0 ? 'text-green-400' : 'text-red-400'}>
                           {holding.pnl >= 0 ? '+' : ''}£{holding.pnl.toFixed(2)}
@@ -452,11 +452,11 @@ export default function OverviewPage() {
                         <span className="text-gray-400/50">—</span>
                       )}
                     </td>
-                    <td className="py-3 text-gray-400/70 text-right">
+                    <td className="py-2 sm:py-3 text-gray-400/70 text-right text-xs">
                       {new Date(holding.purchase_date).toLocaleDateString()}
                     </td>
-                    <td className="py-3 text-right">
-                      <div className="flex justify-end gap-2">
+                    <td className="py-2 sm:py-3 text-right">
+                      <div className="flex justify-end gap-1 sm:gap-2">
                         <AnalysisButton 
                           ticker={holding.ticker}
                           shares={holding.shares}
@@ -464,7 +464,7 @@ export default function OverviewPage() {
                         />
                         <button
                           onClick={() => deleteHolding(holding)}
-                          className="text-red-400/50 hover:text-red-400 transition-all text-sm"
+                          className="text-red-400/50 hover:text-red-400 transition-all text-sm px-1 sm:px-2"
                         >
                           ✕
                         </button>
@@ -479,18 +479,18 @@ export default function OverviewPage() {
       </div>
 
       {/* Export Buttons */}
-      <div className="mt-6 flex gap-3">
+      <div className="mt-6 flex flex-wrap gap-3">
         <button
           onClick={exportCSV}
           disabled={exporting !== null}
-          className="px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all text-sm border border-white/10 disabled:opacity-50"
+          className="flex-1 sm:flex-none px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all text-sm border border-white/10 disabled:opacity-50"
         >
           {exporting === 'csv' ? 'Exporting...' : 'Export CSV'}
         </button>
         <button
           onClick={exportPDF}
           disabled={exporting !== null}
-          className="px-4 py-2 bg-[#d8bb6b]/20 text-[#d8bb6b] rounded-lg hover:bg-[#d8bb6b]/30 transition-all text-sm border border-[#d8bb6b]/20 disabled:opacity-50"
+          className="flex-1 sm:flex-none px-4 py-2 bg-[#d8bb6b]/20 text-[#d8bb6b] rounded-lg hover:bg-[#d8bb6b]/30 transition-all text-sm border border-[#d8bb6b]/20 disabled:opacity-50"
         >
           {exporting === 'pdf' ? 'Exporting...' : 'Export PDF'}
         </button>

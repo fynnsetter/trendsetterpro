@@ -25,7 +25,7 @@ const POPULAR_STOCKS = [
   // Consumer
   { symbol: 'AMZN', name: 'Amazon.com Inc.' },
   { symbol: 'NFLX', name: 'Netflix Inc.' },
-  { symbol: 'MCD', name: 'McDonald\'s Corp.' },
+  { symbol: 'MCD', name: "McDonald's Corp." },
   { symbol: 'NKE', name: 'Nike Inc.' },
   { symbol: 'DIS', name: 'Walt Disney Co.' },
   { symbol: 'SBUX', name: 'Starbucks Corp.' },
@@ -174,12 +174,12 @@ export default function SearchAutocomplete({ onSelect }: SearchAutocompleteProps
     <div ref={wrapperRef} className="relative w-full">
       <input
         type="text"
-        placeholder="Search stocks (e.g., AAPL, Tesla)..."
+        placeholder="Search stocks..."
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onFocus={() => query.length > 0 && setShowResults(true)}
-        className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-xl text-white placeholder:text-gray-400/40 
-        focus:outline-none focus:ring-2 focus:ring-[#d8bb6b]/60"
+        className="w-full px-4 py-2.5 bg-black/20 border border-white/10 rounded-xl text-white placeholder:text-gray-400/40 
+        focus:outline-none focus:ring-2 focus:ring-[#d8bb6b]/60 text-sm"
       />
       
       {showResults && results.length > 0 && (
