@@ -12,65 +12,38 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // 🔥 THE FIX: Use environment variable or fallback to localhost
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
-    
+
+    // Get top stocks from screener
     const screenerRes = await fetch(
-      `${baseUrl}/api/stock-screener?limit=50&risk=${riskTolerance}`,
+      `${baseUrl}/api/stock-screener?limit=30&risk=${riskTolerance}`,
       { cache: 'no-store' }
     )
     const screenerData = await screenerRes.json()
 
     if (!screenerData.stocks || screenerData.stocks.length === 0) {
       return NextResponse.json(
-        { error: 'No stocks found' },
+        { error: 'No stocks found. Please try again.' },
         { status: 404 }
       )
     }
 
-    // 🔥 Different number of stocks based on risk
-    const numStocks = riskTolerance === 'conservative' ? 6 : riskTolerance === 'aggressive' ? 3 : 5
-    const topStocks = screenerData.stocks.slice(0, numStocks)
+    const topStocks = screenerData.stocks.slice(0, 5)
 
-    if (topStocks.length === 0) {
-      return NextResponse.json(
-        { error: 'No suitable stocks found' },
-        { status: 404 }
-      )
-    }
+    // Calculate allocations based on scores
+    const totalScore = topStocks.reduce((sum: number, s: any) => sum + s.score, 0)
+    const suggestions = topStocks.map((stock: any) => ({
+      ticker: stock.ticker,
+      allocation: Math.max((stock.score / totalScore) * 100, 5),
+      expectedReturn: Math.min(Math.max(stock.expectedReturn, -20), 50),
+      volatility: Math.min(stock.volatility, 80),
+      reason: generateReason(stock, riskTolerance),
+      sector: stock.sector || 'Unknown',
+      assetClass: stock.assetClass || 'equity',
+    }))
 
-    // 🔥 Calculate allocations with risk-based concentration
-    const scores = topStocks.map((s: any) => Math.max(s.score, 0.01))
-    const totalScore = scores.reduce((sum: number, s: number) => sum + s, 0)
-
-    const suggestions = topStocks.map((stock: any, index: number) => {
-      let allocation = 0
-      
-      if (riskTolerance === 'conservative') {
-        // Even distribution for safety
-        allocation = 100 / topStocks.length
-      } else if (riskTolerance === 'aggressive') {
-        // 🔥 Aggressive: Top stock gets 40%+, others get smaller pieces
-        const normalizedScore = (stock.score / totalScore) * 100
-        allocation = 15 + (normalizedScore * 0.5)
-      } else {
-        // Moderate: Balanced with slight tiering
-        const normalizedScore = (stock.score / totalScore) * 100
-        allocation = 10 + (normalizedScore * 0.4)
-      }
-
-      return {
-        ticker: stock.ticker,
-        allocation: allocation,
-        expectedReturn: Math.min(Math.max(stock.expectedReturn, -20), 50),
-        volatility: Math.min(stock.volatility, 80),
-        sharpeRatio: stock.sharpeRatio || 0,
-        sector: stock.sector || 'Unknown',
-        assetClass: stock.assetClass || 'equity',
-        reason: generateReason(stock, riskTolerance),
-      }
-    })
-
-    // Normalize to 100%
+    // Normalize allocations to sum to 100%
     const totalAllocation = suggestions.reduce((sum: number, s: any) => sum + s.allocation, 0)
     const normalizedSuggestions = suggestions.map((s: any) => ({
       ...s,
@@ -163,12 +136,11 @@ function runMonteCarlo(initialAmount: number, expectedReturn: number, risk: numb
 
 function generateReason(stock: any, riskTolerance: string): string {
   const riskLevels: Record<string, string> = {
-    conservative: 'Low volatility',
-    moderate: 'Balanced',
-    aggressive: 'High growth',
+    conservative: 'Low volatility, steady growth',
+    moderate: 'Balanced risk-reward',
+    aggressive: 'High growth potential',
   }
-  const sharpeText = stock.sharpeRatio > 1 ? 'Excellent risk-adjusted' : stock.sharpeRatio > 0.5 ? 'Good' : 'Moderate'
-  return `${riskLevels[riskTolerance] || 'Balanced'} - ${stock.sector} (${sharpeText} Sharpe)`
+  return `${riskLevels[riskTolerance] || 'Balanced'} - ${stock.sector} sector`
 }
 
 function generateInsight(
