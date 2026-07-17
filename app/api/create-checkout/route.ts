@@ -17,6 +17,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://trendsetterpro.vercel.app'
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -36,8 +38,8 @@ export async function POST(request: NextRequest) {
         },
       ],
       mode: 'subscription',
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/dashboard/settings?success=true`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/dashboard/settings?canceled=true`,
+      success_url: `${baseUrl}/dashboard/settings?success=true`,
+      cancel_url: `${baseUrl}/dashboard/settings?canceled=true`,
       customer_email: email,
       metadata: {
         userId,

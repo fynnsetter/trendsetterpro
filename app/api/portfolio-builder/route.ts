@@ -12,10 +12,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 🔥 THE FIX: Use environment variable or fallback to localhost
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://trendsetterpro.vercel.app'
 
-    // Get top stocks from screener
     const screenerRes = await fetch(
       `${baseUrl}/api/stock-screener?limit=30&risk=${riskTolerance}`,
       { cache: 'no-store' }
@@ -31,7 +29,6 @@ export async function POST(request: NextRequest) {
 
     const topStocks = screenerData.stocks.slice(0, 5)
 
-    // Calculate allocations based on scores
     const totalScore = topStocks.reduce((sum: number, s: any) => sum + s.score, 0)
     const suggestions = topStocks.map((stock: any) => ({
       ticker: stock.ticker,
@@ -43,14 +40,12 @@ export async function POST(request: NextRequest) {
       assetClass: stock.assetClass || 'equity',
     }))
 
-    // Normalize allocations to sum to 100%
     const totalAllocation = suggestions.reduce((sum: number, s: any) => sum + s.allocation, 0)
     const normalizedSuggestions = suggestions.map((s: any) => ({
       ...s,
       allocation: (s.allocation / totalAllocation) * 100,
     }))
 
-    // Calculate portfolio metrics
     const annualReturn = normalizedSuggestions.reduce(
       (sum: number, s: any) => sum + (s.expectedReturn * s.allocation / 100), 0
     )

@@ -36,9 +36,8 @@ export async function POST(request: NextRequest) {
 
     let currentValue = 0
     for (const holding of holdings || []) {
-      const priceRes = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/stock-price?symbol=${holding.ticker}`
-      )
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://trendsetterpro.vercel.app'
+      const priceRes = await fetch(`${baseUrl}/api/stock-price?symbol=${holding.ticker}`)
       const priceData = await priceRes.json()
       currentValue += holding.shares * (priceData.price || holding.avg_price)
     }
@@ -46,7 +45,6 @@ export async function POST(request: NextRequest) {
     const profit = currentValue - challenge.initial_amount
     const profitPercent = (profit / challenge.initial_amount) * 100
 
-    // Check if challenge is complete
     const endDate = new Date(challenge.created_at)
     endDate.setMonth(endDate.getMonth() + challenge.timeframe_months)
     const isComplete = new Date() >= endDate

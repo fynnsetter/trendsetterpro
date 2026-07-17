@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
   const exclude = searchParams.get('exclude') || ''
 
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://trendsetterpro.vercel.app'
     const dbRes = await fetch(`${baseUrl}/api/stocks?limit=${limit}`, { cache: 'no-store' })
     const dbData = await dbRes.json()
 
@@ -25,21 +25,16 @@ export async function GET(request: NextRequest) {
       stocks = stocks.filter((s: any) => !excludeList.includes(s.ticker))
     }
 
-    // Filter out very low quality stocks
     stocks = stocks.filter((s: any) => s.expectedReturn > -5)
 
-    // 🔥 DIFFERENT FILTERING FOR EACH RISK LEVEL
     let selectedStocks = []
     const allStocks = [...stocks]
 
     if (riskLevel === 'conservative') {
-      // Conservative: Positive returns, low volatility
       const filtered = allStocks.filter((s: any) => s.expectedReturn > 2 && s.volatility < 30)
-      // Sort by Sharpe ratio (best first)
       filtered.sort((a: any, b: any) => b.sharpeRatio - a.sharpeRatio)
       selectedStocks = filtered.slice(0, 10)
       
-      // If not enough stocks, expand criteria
       if (selectedStocks.length < 4) {
         const expanded = allStocks.filter((s: any) => s.expectedReturn > 0 && s.volatility < 35)
         expanded.sort((a: any, b: any) => b.sharpeRatio - a.sharpeRatio)
@@ -47,13 +42,10 @@ export async function GET(request: NextRequest) {
       }
     } 
     else if (riskLevel === 'aggressive') {
-      // Aggressive: High growth potential (higher expected return)
       const filtered = allStocks.filter((s: any) => s.expectedReturn > 8)
-      // Sort by expected return (highest first)
       filtered.sort((a: any, b: any) => b.expectedReturn - a.expectedReturn)
       selectedStocks = filtered.slice(0, 10)
       
-      // If not enough stocks, expand criteria
       if (selectedStocks.length < 4) {
         const expanded = allStocks.filter((s: any) => s.expectedReturn > 5)
         expanded.sort((a: any, b: any) => b.expectedReturn - a.expectedReturn)
@@ -61,13 +53,10 @@ export async function GET(request: NextRequest) {
       }
     } 
     else {
-      // Moderate: Balanced approach
       const filtered = allStocks.filter((s: any) => s.expectedReturn > 2 && s.volatility > 10 && s.volatility < 45)
-      // Sort by Sharpe ratio (best first)
       filtered.sort((a: any, b: any) => b.sharpeRatio - a.sharpeRatio)
       selectedStocks = filtered.slice(0, 10)
       
-      // If not enough stocks, expand criteria
       if (selectedStocks.length < 4) {
         const expanded = allStocks.filter((s: any) => s.expectedReturn > 1)
         expanded.sort((a: any, b: any) => b.sharpeRatio - a.sharpeRatio)
@@ -75,18 +64,15 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Ensure we have at least 3 stocks
     if (selectedStocks.length < 3) {
       const fallback = allStocks.sort((a: any, b: any) => b.sharpeRatio - a.sharpeRatio).slice(0, 8)
       selectedStocks = fallback
     }
 
-    // 🔥 DIVERSIFY: Enforce sector diversification
     const sectors: Record<string, number> = {}
     const finalStocks = []
     const maxSectorAllocation = riskLevel === 'conservative' ? 0.40 : riskLevel === 'aggressive' ? 0.50 : 0.45
 
-    // Shuffle the selected stocks to get variety
     const shuffled = [...selectedStocks]
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -100,7 +86,6 @@ export async function GET(request: NextRequest) {
       const currentSectorCount = sectors[sector] || 0
       const totalSelected = finalStocks.length
       
-      // Allow more sector concentration for aggressive
       const allowed = riskLevel === 'aggressive' ? 0.60 : 0.40
       if (currentSectorCount / Math.max(totalSelected, 1) < allowed || totalSelected < 2) {
         finalStocks.push(stock)
@@ -108,7 +93,6 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // If we still don't have enough, add more
     if (finalStocks.length < 3) {
       for (const stock of shuffled) {
         if (!finalStocks.includes(stock) && finalStocks.length < 6) {
@@ -117,7 +101,6 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // 🔥 Score for allocation weighting
     const scoredStocks = finalStocks.map((s: any) => {
       let score = 0
       if (riskLevel === 'conservative') {
@@ -130,7 +113,6 @@ export async function GET(request: NextRequest) {
       return { ...s, score }
     })
 
-    // Sort by score for final ordering
     scoredStocks.sort((a: any, b: any) => b.score - a.score)
 
     return NextResponse.json({
